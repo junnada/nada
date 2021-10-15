@@ -1,0 +1,75 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+import re
+from matplotlib.dates import MonthLocator, DateFormatter
+from matplotlib.ticker import MultipleLocator, IndexLocator, FuncFormatter
+import matplotlib.dates as mdates
+
+df = pd.read_csv('모바일 금액_total_1.csv', encoding='euc-kr')
+
+pd.options.display.float_format = '{:.1f}'.format
+# pd.reset_option('display.float_format')
+
+df
+
+plt.figure(figsize=(40,20))
+xs=df["업종"][0:10]
+ys=df['업종합계'][0:10]
+plt.figure(figsize=(10, 6))
+#plt.xlabel('업종')
+#plt.ylabel('합계')
+plt.title('업종별 판매현황')
+plt.xticks(fontsize=10)
+plt.axis()
+plt.ylim([0, 14000000000.0])
+
+plt.xticks(rotation = 45, fontsize=13)
+plt.yticks(fontsize=12)
+plt.bar(xs, ys, width=0.6, color='blue')
+
+plt.show()
+plt.savefig('./업종별 판매현황1.png')
+
+df = pd.read_csv('19년발행현황.csv',index_col=0, encoding='euc-kr')
+df3 = pd.read_csv('19년환전현황.csv',index_col=0, encoding='euc-kr')
+
+df
+
+df3
+
+fig = plt.figure(figsize=(20,10))
+fig.set_facecolor('white') 
+ax = fig.add_subplot() 
+ax.plot(df['금액'], marker='o', markersize=15, label='발매', color='b', linewidth=3, linestyle='solid')
+ax.plot(df3['금액'],marker='o', markersize=15, label='환전', color='r', linewidth=3, linestyle='solid')
+plt.title('2019년 현황',fontsize=20)
+#ax.set_ylabel('금액', fontsize=14)
+#ax.set_xlabel('월', fontsize=14)
+ax.legend(fontsize=15, loc='best')
+plt.xticks(fontsize=20)
+plt.yticks(fontsize=15)
+# plt.xticks(rotation = 45)
+plt.show()
+
+
+df1 = pd.read_csv('20년발행현황.csv',index_col=0, encoding='euc-kr')
+df4 = pd.read_csv('20년환전현황.csv',index_col=0, encoding='euc-kr')
+
+df1
+df4
+
+fig = plt.figure(figsize=(20,10))
+fig.set_facecolor('white') 
+ax = fig.add_subplot() 
+ax.plot(df1['금액'], marker='o', markersize=15, label='발매', color='b', linewidth=3, linestyle='solid')
+ax.plot(df4['금액'],marker='o', markersize=15, label='환전', color='r', linewidth=3, linestyle='solid')
+plt.title('2020년 현황',fontsize=20)
+#ax.set_ylabel('금액', fontsize=14)
+#ax.set_xlabel('월', fontsize=14)
+ax.legend(fontsize=15, loc='best')
+plt.xticks(fontsize=20)
+plt.yticks(fontsize=15)
+# plt.xticks(rotation = 45)
+
+plt.show()

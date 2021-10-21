@@ -73,3 +73,166 @@ plt.yticks(fontsize=15)
 # plt.xticks(rotation = 45)
 
 plt.show()
+
+--------------------------------------------------------------------------------------------------------------------------------------
+df5 = pd.read_csv('가맹점현황 2020-1.csv',index_col=0)
+
+df5
+
+CountStatus = pd.value_counts(df5['업종'].values, sort=True)
+
+CountStatus.plot.bar()
+CountStatus.plot.bar(figsize=(10,8), fontsize=15)
+plt.xticks(fontsize=14) 
+plt.yticks(fontsize=13)
+plt.xticks(rotation=45)
+plt.show()
+
+--------------------------------------------------------------------------------------------------------------------------------------
+
+# 크롤링1
+import pandas as pd
+from tqdm import tqdm
+from konlpy.tag import Okt
+from sklearn.feature_extraction.text import CountVectorizer
+# DTM을 편리하게 만들어주기 위해 Scikit-Learn에서 제공하는 CountVectorizer를 import 한다.
+
+from urllib.parse import quote_plus
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from wordcloud import WordCloud, STOPWORDS
+import matplotlib.pyplot as plt
+
+# 한글 폰트 패스로 지정
+import matplotlib.font_manager as fm
+import re
+import collections
+
+baseurl = 'https://www.google.com/search?q='
+plusurl = '폭염취약계층'
+url = baseurl + quote_plus(plusurl)
+page = []
+page2 = '&ei=JNEQYZ_AKYP7-Qaj4LWQBQ&start=10&sa=N&ved=2ahUKEwif4pfaraPyAhWDfd4KHSNwDVIQ8tMDegQIAhA6&cshid=1628492204316429&biw=982&bih=710&dpr=1.25'
+page3 = '&ei=T9IQYeCGFNPpwQP8woNY&start=20&sa=N&ved=2ahUKEwig6svorqPyAhXTdHAKHXzhAAs4ChDy0wN6BAgBEDw&biw=982&bih=710'
+page4 = '&ei=e9IQYaSiIIb1wAPkqoSYAw&start=30&sa=N&ved=2ahUKEwjky9X9rqPyAhWGOnAKHWQVATM4FBDy0wN6BAgBED4&biw=982&bih=710'
+page5 = '&ei=JdkQYYzNKbvdmAWA-YS4Dw&start=40&sa=N&ved=2ahUKEwjM85yrtaPyAhW7LqYKHYA8Afc4ChDy0wN6BAgBEEA&biw=982&bih=710'
+page6 = '&ei=7NgQYe7cFaammAXql5OYBA&start=50&sa=N&ved=2ahUKEwjugvKPtaPyAhUmE6YKHerLBEM4KBDy0wN6BAgBEEI&cshid=1628494130552094&biw=982&bih=710'
+page7 = '&ei=dNkQYbiEAdaFoASkr4XQAw&start=60&sa=N&ved=2ahUKEwi4jsrQtaPyAhXWAogKHaRXATo4MhDy0wN6BAgBEEQ&biw=982&bih=710'
+page8 = '&ei=fdkQYcPALJGC-Abi8YvABw&start=70&sa=N&ved=2ahUKEwiD85rVtaPyAhURAd4KHeL4Ang4PBDy0wN6BAgBEEQ&biw=982&bih=710'
+page9 = '&ei=idkQYbqwGdbywQOvgYi4Dw&start=80&sa=N&ved=2ahUKEwj6mOTataPyAhVWeXAKHa8AAvc4RhDy0wN6BAgBEEQ&biw=982&bih=710'
+page10 = '&ei=ktkQYcXyII70-Qbh74hI&start=90&sa=N&ved=2ahUKEwjFg5HftaPyAhUOet4KHeE3Agk4UBDy0wN6BAgBEEQ&biw=982&bih=710'
+page11 = '&ei=oNkQYeqSEtfmhwOZuKyYCA&start=100&sa=N&ved=2ahUKEwjq4tjltaPyAhVX82EKHRkcC4M4WhDy0wN6BAgBEEQ&biw=982&bih=710'
+page12 = '&ei=rtkQYcDSCdWD-Abb443oCQ&start=110&sa=N&ved=2ahUKEwjA4abstaPyAhXVAd4KHdtxA504ZBDy0wN6BAgBEEQ&biw=982&bih=710'
+page13 = '&ei=v9kQYaqbNcH0-QbjxJXoCA&start=120&sa=N&ved=2ahUKEwjq9t_0taPyAhVBet4KHWNiBY04bhDy0wN6BAgBEEQ&biw=982&bih=710'
+page14 = '&ei=4dkQYY_nDNmkoASXrpGQDg&start=130&sa=N&ved=2ahUKEwjP29KEtqPyAhVZEogKHRdXBOI4jAEQ8tMDegQIARBD&biw=982&bih=710'
+page15 = '&ei=7dkQYerZGJOJ-AbF15PwAg&start=140&sa=N&ved=2ahUKEwiqhLuKtqPyAhWTBN4KHcXrBC44ggEQ8tMDegQIARBE&biw=982&bih=710'
+page = [url,page2,page3,page4,page5,page6,page7,page8,page9,page10,page11,page12,page13,page14,page15]
+
+options = webdriver.ChromeOptions()
+options.add_argument('headless')
+options.add_argument('window-size=1920x1080')
+
+title = []
+content = []
+content_span = []
+for i in range(0,1):
+    if i != 0:
+        url = url + page[i]
+    
+    driver = webdriver.Chrome('chromedriver', options=options)
+    driver.get(url)
+    html = driver.page_source
+    soup = BeautifulSoup(html,"lxml")
+    titles = soup.select('.yuRUbf')
+    for i in titles:
+        title.append(i.select_one('.LC20lb.DKV0Md').text)
+    
+    contents = soup.select('.IsZvec')
+    for i in contents :
+        content.append(i.select('.VwiC3b.yXK7lf.MUxGbd.yDYNvb.lyLwlc.lEBKkf > span'))
+
+text = ""
+for con in contents:
+    for x in con:
+        content_span.append(x.text)
+        text += x.text
+        
+# 특수문자 공백으로 치환, 연속된 공백 제거
+def funReplacement(str):
+    # 특수문자 치환
+    tmp = re.sub(re.compile(
+        "\(|\)|,|\+|-|/|=|\*|\'|\"|\n|\.", re.DOTALL), " ", str)
+    # 연속된 공백제거
+    tmp = re.sub(re.compile("[ ]{1,}", re.DOTALL), " ", tmp)
+
+    return tmp
+
+# 공백기준으로 split (list 형식으로 반환)
+textLst = funReplacement(text).split()
+
+# 단어 갯수 세기
+word_counts = {}
+for word in textLst:
+    if word not in word_counts:
+        word_counts[word] = 0
+
+    word_counts[word] += 1
+
+print(word_counts)
+
+stopwords = set(STOPWORDS)
+stopwords.add('2021')
+stopwords.add('7')
+stopwords.add('-')
+stopwords.add('기자')
+stopwords.add('연합')
+stopwords.add('뉴스')
+
+# dictionary 사용 #1
+wc3 = WordCloud(max_font_size=200, stopwords=stopwords, font_path='./Library/Fonts/NanumSquareLight.ttf',
+                background_color='white', width=800, height=800).generate_from_frequencies(word_counts)
+
+plt.figure(figsize=(10, 8))
+plt.imshow(wc3)
+plt.tight_layout(pad=0)
+plt.axis('off')
+plt.show()
+------------------------------------------------------------------------------
+from wordcloud import WordCloud, STOPWORDS
+import matplotlib.pyplot as plt
+
+# 한글 폰트 패스로 지정
+import matplotlib.font_manager as fm
+import re
+import collections
+
+from collections import Counter
+from konlpy.tag import Twitter
+import pytagcloud
+import pygame
+import pygame as pg
+
+f = open('네이버뉴스_거제사랑상품권_2021-10-21_13시14분-1.txt', 'r', encoding = 'utf8')
+data = f.read()
+
+spwords = set(STOPWORDS)
+spwords.add('폭염')
+
+nlp = Twitter()
+nouns = nlp.nouns(data)
+
+wc1 = WordCloud(max_font_size=200, stopwords=spwords, font_path='C:/Users/user/AppData/Local/Microsoft/Windows/Fonts/NanumGothic.ttf',
+                background_color='white', width=800, height=800)
+wc1.generate(text)
+
+count = Counter(nouns)
+tags2 = count.most_common(100)
+taglist = pytagcloud.make_tags(tags2, maxsize=200)
+
+plt.figure(figsize=(10, 8))
+plt.imshow(wc1)
+plt.tight_layout(pad=0)
+plt.axis('off')
+spwords = set(STOPWORDS)
+spwords.add('폭염')plt.show()
+
